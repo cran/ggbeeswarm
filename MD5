@@ -1,0 +1,13 @@
+471c96644e1cbf5e9c599f392865b56a *DESCRIPTION
+902388cece88cbc77209f0dbafa726d3 *NAMESPACE
+817c246f0f2cd0859230a61ff67e7754 *R/geom-beeswarm.R
+203920b120cee83497c48f8d35bad462 *R/geom-quasirandom.R
+a96c8d5c14ac9416ef1221a3536ecb51 *R/ggbeeswarm-package.R
+fe0939b29a0b5cf59370e02a471f8e19 *R/position-beeswarm.R
+62186bbbe6302d29395cec6f0bc3459f *R/position-quasirandom.R
+448a08b17df8bcbc0d2b87aaf4969a40 *build/partial.rdb
+04b8ad098efeb9a3d952a2eba70be8c6 *man/geom_beeswarm.Rd
+746428f7fd70e10f16491a4fd045278f *man/geom_quasirandom.Rd
+7df10da08e30bf64fa72101d29f4e164 *man/ggbeeswarm.Rd
+60ebc4c66d87d20e4a913b65508eb19a *man/position_beeswarm.Rd
+540d5a477a72ecde1c333c47d98d1b82 *man/position_quasirandom.Rd
