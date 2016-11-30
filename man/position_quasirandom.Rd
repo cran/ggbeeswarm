@@ -5,7 +5,7 @@
 \title{Violin point-style plots to show overlapping points. x must be discrete.}
 \usage{
 position_quasirandom(width = NULL, varwidth = FALSE, bandwidth = 0.5,
-  nbins = 1000, method = "quasirandom", groupOnX = NULL,
+  nbins = NULL, method = "quasirandom", groupOnX = NULL,
   dodge.width = 0)
 }
 \arguments{
@@ -13,7 +13,7 @@ position_quasirandom(width = NULL, varwidth = FALSE, bandwidth = 0.5,
 
 \item{varwidth}{vary the width by the relative size of each group}
 
-\item{bandwidth}{the bandwidth adjustment to use when calculating density 
+\item{bandwidth}{the bandwidth adjustment to use when calculating density
 Smaller numbers (< 1) produce a tighter "fit". (default: 0.5)}
 
 \item{nbins}{the number of bins used when calculating density (has little effect with quasirandom/random distribution)}

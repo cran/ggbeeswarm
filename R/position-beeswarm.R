@@ -20,7 +20,7 @@
 #'   ggplot2::qplot(variable, value, data = distro) +
 #'     geom_beeswarm(priority='density',cex=2.5)
 #'
-position_beeswarm <- function (priority = c("ascending", "descending", "density", "random", "none"),cex=2,groupOnX=NULL,dodge.width=0) {
+position_beeswarm <- function (priority = c("ascending", "descending", "density", "random", "none"),cex=2,groupOnX=NULL,dodge.width=0){
   ggplot2::ggproto(NULL,PositionBeeswarm,priority = priority,cex=cex,groupOnX=NULL,dodge.width=dodge.width)
 }
 
@@ -31,40 +31,52 @@ PositionBeeswarm <- ggplot2::ggproto("PositionBeeswarm",ggplot2:::Position, requ
     groupOnX=self$groupOnX,
     dodge.width=self$dodge.width)
   },
-  compute_panel=function(data,params,scales){
-	# Adjust function is used to calculate new positions (from ggplot2:::Position)
-		data <- remove_missing(data, vars = c("x","y"), name = "position_beeswarm")
-		if (nrow(data)==0) return(data.frame())
+  compute_panel= function(data,params,scales){
+    # Adjust function is used to calculate new positions (from ggplot2:::Position)
+    data <- remove_missing(data, vars = c("x","y"), name = "position_beeswarm")
+    if (nrow(data)==0) return(data.frame())
 
-		# more unique entries in x than y suggests y (not x) is categorical
+    # more unique entries in x than y suggests y (not x) is categorical
     if(is.null(params$groupOnX)) params$groupOnX <- length(unique(data$y)) > length(unique(data$x))
-    
+
     # dodge
-    data <- ggplot2:::collide(data,
-    	params$dodge.width,
-    	"position_dodge", 
-    	ggplot2:::pos_dodge,
-    	check.width = FALSE)
-    	
+    if(!params$groupOnX){
+      data[,c('x','y')]<-data[,c('y','x')]
+      origCols<-colnames(data)
+    }
+    data <- ggplot2:::collide(
+      data,
+      params$dodge.width,
+      "position_dodge", 
+      ggplot2:::pos_dodge,
+      check.width = FALSE
+    )
+    if(!params$groupOnX){
+      data[,c('x','y')]<-data[,c('y','x')]
+      #remove x/y min/max created by collide
+      data<-data[,origCols]
+    }
+
     # then beeswarm
     trans_x<-NULL
     trans_y<-NULL
 
-    trans_xy <- function(x) {
-      newX<-ave(data[,ifelse(params$groupOnX,'y','x')],data[,ifelse(params$groupOnX,'x','y')],
-          FUN=function(xx) {
-            if (length(xx) < 2) {
-              return(0)
-            } else {
-              beeswarm::swarmx(0,xx,cex=params$cex,priority=params$priority)$x            
-            }})
-      return(newX+x)
+    trans_xy <- function(xx){
+      newX<-ave(
+        data[,ifelse(params$groupOnX,'y','x')],
+        data[,ifelse(params$groupOnX,'x','y')],
+        FUN=function(yy){
+          if (length(yy) == 1) return(0)
+          else beeswarm::swarmx(0,yy,cex=params$cex,priority=params$priority)$x
+        }
+      )
+      return(newX+xx)
     }
 
     if(params$groupOnX) trans_x<-trans_xy
     else trans_y<-trans_xy
 
-		transform_position(data, trans_x, trans_y)
-	}
+    transform_position(data, trans_x, trans_y)
+  }
 )
 
