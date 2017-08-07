@@ -7,21 +7,14 @@
 #' Smaller numbers (< 1) produce a tighter "fit". (default: 0.5)
 #' @param nbins the number of bins used when calculating density (has little effect with quasirandom/random distribution)
 #' @param method the method used for distributing points (quasirandom, pseudorandom, smiley or frowney)
-#' @param groupOnX should jitter be added to the x axis if TRUE or y axis if FALSE (the default NULL causes the function to guess which axis is the categorical one based on the number of unique entries in each)
+#' @param groupOnX if TRUE then jitter is added to the x axis and if FALSE jitter is added to the y axis. Prior to v0.6.0, the default NULL causes the function to guess which axis is the categorical one based on the number of unique entries in each. This could result in unexpected results when the x variable has few unique values and so in v0.6.0 the default was changed to always jitter on the x axis unless groupOnX=FALSE. Also consider \code{\link[ggplot2]{coord_flip}}.
 #' @param dodge.width Amount by which points from different aesthetic groups will be dodged. This requires that one of the aesthetics is a factor.
 #' @export
 #' @importFrom vipor offsetX
 #' @seealso \code{\link[vipor]{offsetX}}
 #' @examples
 #' 
-#'   ggplot2::qplot(class, hwy, data = ggplot2::mpg, geom='quasirandom')
-#'   # Generate fake data
-#'   distro <- data.frame(
-#'     'variable'=rep(c('runif','rnorm'),each=100),
-#'     'value'=c(runif(100, min=-3, max=3), rnorm(100))
-#'   )
-#'   ggplot2::qplot(variable, value, data = distro, geom = 'quasirandom')
-#'   ggplot2::qplot(variable, value, data = distro) + geom_quasirandom(width=0.1)
+#'   ggplot2::qplot(class, hwy, data = ggplot2::mpg, position=position_quasirandom())
 #'
 position_quasirandom <- function (width = NULL, varwidth = FALSE, bandwidth=.5,nbins=NULL,method='quasirandom',groupOnX=NULL,dodge.width=0){
   ggplot2::ggproto(NULL,PositionQuasirandom,width = width, varwidth = varwidth, bandwidth=bandwidth,nbins=nbins,method=method,groupOnX=groupOnX,dodge.width=dodge.width)
@@ -35,7 +28,10 @@ PositionQuasirandom <- ggplot2::ggproto("PositionQuasirandom",ggplot2:::Position
     data <- remove_missing(data, vars = c("x","y"), name = "position_quasirandom")
     if (nrow(data)==0) return(data.frame())
 
-    if(is.null(params$groupOnX)) params$groupOnX <- length(unique(data$y)) > length(unique(data$x))
+    if(is.null(params$groupOnX)){
+      params$groupOnX<-TRUE
+      if(length(unique(data$y)) <= length(unique(data$x))) warning('The default behavior of beeswarm has changed in version 0.6.0. In versions <0.6.0, this plot would have been dodged on the y-axis.  In versions >=0.6.0, grouponX=FALSE must be explicitly set to group on y-axis. Please set grouponX=TRUE/FALSE to avoid this warning and ensure proper axis choice.')
+    }
 
     # dodge
     if(!params$groupOnX){

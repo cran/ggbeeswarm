@@ -12,7 +12,7 @@ position_beeswarm(priority = c("ascending", "descending", "density", "random",
 
 \item{cex}{Scaling for adjusting point spacing (see \code{\link{swarmx}})}
 
-\item{groupOnX}{should jitter be added to the x axis if TRUE or y axis if FALSE (the default NULL causes the function to guess which axis is the categorical one based on the number of unique entries in each)}
+\item{groupOnX}{if TRUE then jitter is added to the x axis and if FALSE jitter is added to the y axis. Prior to v0.6.0, the default NULL causes the function to guess which axis is the categorical one based on the number of unique entries in each. This could result in unexpected results when the x variable has few unique values and so in v0.6.0 the default was changed to always jitter on the x axis unless groupOnX=FALSE. Also consider \code{\link[ggplot2]{coord_flip}}.}
 
 \item{dodge.width}{Amount by which points from different aesthetic groups will be dodged. This requires that one of the aesthetics is a factor.}
 }
@@ -21,20 +21,11 @@ Violin point-style plots to show overlapping points. x must be discrete.
 }
 \examples{
 
-  ggplot2::qplot(class, hwy, data = ggplot2::mpg, geom='beeswarm')
-  # Generate fake data
-  distro <- data.frame(
-    'variable'=rep(c('runif','rnorm'),each=100),
-    'value'=c(runif(100, min=-3, max=3), rnorm(100))
-  )
-  ggplot2::qplot(variable, value, data = distro, geom='beeswarm')
-  ggplot2::qplot(variable, value, data = distro) +
-    geom_beeswarm(priority='density',cex=2.5)
+  ggplot2::qplot(class, hwy, data = ggplot2::mpg, position=position_beeswarm())
 
 }
 \seealso{
 \code{\link{position_quasirandom}}, \code{\link[beeswarm]{swarmx}}
 
-Other position.adjustments: \code{\link{position_quasirandom}}
+Other position adjustments: \code{\link{position_quasirandom}}
 }
-

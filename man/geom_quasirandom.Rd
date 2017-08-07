@@ -41,7 +41,7 @@ Smaller numbers (< 1) produce a tighter "fit". (default: 0.5)}
 
 \item{method}{the method used for distributing points (quasirandom, pseudorandom, smiley or frowney)}
 
-\item{groupOnX}{should jitter be added to the x axis if TRUE or y axis if FALSE (the default NULL causes the function to guess which axis is the categorical one based on the number of unique entries in each)}
+\item{groupOnX}{if TRUE then jitter is added to the x axis and if FALSE jitter is added to the y axis. Prior to v0.6.0, the default NULL causes the function to guess which axis is the categorical one based on the number of unique entries in each. This could result in unexpected results when the x variable has few unique values and so in v0.6.0 the default was changed to always jitter on the x axis unless groupOnX=FALSE. Also consider \code{\link[ggplot2]{coord_flip}}.}
 
 \item{dodge.width}{Amount by which points from different aesthetic groups will be dodged. This requires that one of the aesthetics is a factor.}
 
@@ -51,8 +51,8 @@ layer, as a string.}
 \item{position}{Position adjustment, either as a string, or the result of
 a call to a position adjustment function.}
 
-\item{na.rm}{If \code{FALSE} (the default), removes missing values with
-a warning.  If \code{TRUE} silently removes missing values.}
+\item{na.rm}{If \code{FALSE}, the default, missing values are removed with
+a warning. If \code{TRUE}, missing values are silently removed.}
 
 \item{show.legend}{logical. Should this layer be included in the legends?
 \code{NA}, the default, includes if any aesthetics are mapped.
@@ -75,6 +75,7 @@ The quasirandom geom is a convenient means to offset points within categories to
 
 \Sexpr[results=rd,stage=build]{ggplot2:::rd_aesthetics("geom", "point")}
 }
+
 \examples{
   ggplot2::qplot(class, hwy, data = ggplot2::mpg, geom='quasirandom')
   # Generate fake data
@@ -83,7 +84,7 @@ The quasirandom geom is a convenient means to offset points within categories to
     'value'=c(runif(100, min=-3, max=3), rnorm(100))
   )
   ggplot2::qplot(variable, value, data = distro, geom = 'quasirandom')
-  ggplot2::qplot(variable, value, data = distro) + geom_quasirandom(width=0.1)
+  ggplot2::ggplot(distro,aes(variable, value)) + geom_quasirandom(width=0.1)
 }
 \seealso{
 \code{\link[vipor]{offsetX}} how spacing is determined,
@@ -92,4 +93,3 @@ The quasirandom geom is a convenient means to offset points within categories to
  \code{\link{geom_boxplot}} for another way of looking at the conditional
     distribution of a variable
 }
-
