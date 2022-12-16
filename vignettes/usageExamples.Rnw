@@ -7,10 +7,10 @@ packageInfo <- packageDescription("ggbeeswarm")
 library(ggbeeswarm)
 packageKeywords<-"visualization, display, one dimensional, grouped, groups, violin, scatter, points, quasirandom, beeswarm, van der Corput, beeswarm, ggplot, ggplot2"
 @
-%\VignetteIndexEntry{vipor package usage examples}
+%\VignetteIndexEntry{ggbeeswarm package usage examples}
 %\VignetteDepends{}
 %\VignetteKeywords{visualization, display, one dimensional, grouped, groups, violin, scatter, points, quasirandom, beeswarm, van der Corput, beeswarm, ggplot, ggplot2}
-%\VignettePackage{vipor}
+%\VignettePackage{ggbeeswarm}
 
 \title{\pkg{\Sexpr{packageInfo$Package}} package usage example (version \Sexpr{packageInfo$Version})}
 \author{\Sexpr{packageInfo$Author}}
@@ -26,6 +26,7 @@ packageKeywords<-"visualization, display, one dimensional, grouped, groups, viol
 }
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 \SweaveOpts{engine=R,eps=FALSE}
 
 \section{The basics}
@@ -112,7 +113,7 @@ And with \code{geom_beeswarm}:
 \end{center}
 <<dodgeYBee, echo=TRUE, eval=FALSE>>=
   ggplot(mapping=aes(dat,labs,color=labs2)) +
-    geom_beeswarm(dodge.width=.8,cex=2,groupOnX=FALSE)
+    geom_beeswarm(dodge.width=.8,cex=2)
 @
 \begin{center}
 <<showDodgeYBee, fig=TRUE, height=3.5, width=5, echo=FALSE>>=
@@ -184,7 +185,7 @@ The first four options are included within \code{geom_quasirandom} using the \co
     theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
   p4<-ggplot(mapping=aes(labs, dat)) +
     geom_quasirandom(method='frowney',alpha=.2) +
-    ggtitle('smiley') + labs(x='') +
+    ggtitle('frowney') + labs(x='') +
     theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
   p5<-ggplot(mapping=aes(labs, dat)) +
     geom_quasirandom(method='tukey',alpha=.2) +

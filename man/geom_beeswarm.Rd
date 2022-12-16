@@ -4,61 +4,99 @@
 \alias{geom_beeswarm}
 \title{Points, jittered to reduce overplotting using the beeswarm package}
 \usage{
-geom_beeswarm(mapping = NULL, data = NULL, priority = c("ascending",
-  "descending", "density", "random", "none"), cex = 1, groupOnX = NULL,
-  dodge.width = 0, stat = "identity", na.rm = FALSE, show.legend = NA,
-  inherit.aes = TRUE, ...)
+geom_beeswarm(
+  mapping = NULL,
+  data = NULL,
+  stat = "identity",
+  ...,
+  method = "swarm",
+  cex = 1,
+  side = 0L,
+  priority = "ascending",
+  fast = TRUE,
+  dodge.width = NULL,
+  corral = "none",
+  corral.width = 0.9,
+  groupOnX = NULL,
+  beeswarmArgs = list(),
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE
+)
 }
 \arguments{
-\item{mapping}{Set of aesthetic mappings created by \code{\link{aes}} or
-\code{\link{aes_}}. If specified and \code{inherit.aes = TRUE} (the
-default), it is combined with the default mapping at the top level of the
-plot. You must supply \code{mapping} if there is no plot mapping.}
+\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and
+\code{inherit.aes = TRUE} (the default), it is combined with the default mapping
+at the top level of the plot. You must supply \code{mapping} if there is no plot
+mapping.}
 
 \item{data}{The data to be displayed in this layer. There are three
-   options:
+options:
 
-   If \code{NULL}, the default, the data is inherited from the plot
-   data as specified in the call to \code{\link{ggplot}}.
+If \code{NULL}, the default, the data is inherited from the plot
+data as specified in the call to \code{\link[ggplot2:ggplot]{ggplot()}}.
 
-   A \code{data.frame}, or other object, will override the plot
-   data. All objects will be fortified to produce a data frame. See
-   \code{\link{fortify}} for which variables will be created.
+A \code{data.frame}, or other object, will override the plot
+data. All objects will be fortified to produce a data frame. See
+\code{\link[ggplot2:fortify]{fortify()}} for which variables will be created.
 
-   A \code{function} will be called with a single argument,
-   the plot data. The return value must be a \code{data.frame.}, and
-   will be used as the layer data.}
-
-\item{priority}{Method used to perform point layout (see \code{\link{swarmx}})}
-
-\item{cex}{Scaling for adjusting point spacing (see \code{\link{swarmx}})}
-
-\item{groupOnX}{if TRUE then jitter is added to the x axis and if FALSE jitter is added to the y axis. Prior to v0.6.0, the default NULL causes the function to guess which axis is the categorical one based on the number of unique entries in each. This could result in unexpected results when the x variable has few unique values and so in v0.6.0 the default was changed to always jitter on the x axis unless groupOnX=FALSE. Also consider \code{\link[ggplot2]{coord_flip}}.}
-
-\item{dodge.width}{Amount by which points from different aesthetic groups will be dodged. This requires that one of the aesthetics is a factor.}
+A \code{function} will be called with a single argument,
+the plot data. The return value must be a \code{data.frame}, and
+will be used as the layer data. A \code{function} can be created
+from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
 \item{stat}{The statistical transformation to use on the data for this
-layer, as a string.}
+layer, either as a \code{ggproto} \code{Geom} subclass or as a string naming the
+stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
+\code{"stat_count"})}
+
+\item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}. These are
+often aesthetics, used to set an aesthetic to a fixed value, like
+\code{colour = "red"} or \code{size = 3}. They may also be parameters
+to the paired geom/stat.}
+
+\item{method}{Method for arranging points (see Details below)}
+
+\item{cex}{Scaling for adjusting point spacing (see \code{\link[beeswarm:swarmx]{beeswarm::swarmx()}}).
+Values between 1 (default) and 3 tend to work best.}
+
+\item{side}{Direction to perform jittering: 0: both directions;
+1: to the right or upwards; -1: to the left or downwards.}
+
+\item{priority}{Method used to perform point layout (see Details below)}
+
+\item{fast}{Use compiled version of swarm algorithm? This option is ignored
+for all methods expect \code{"swarm"} and \code{"compactswarm"}.}
+
+\item{dodge.width}{Amount by which points from different aesthetic groups
+will be dodged. This requires that one of the aesthetics is a factor.}
+
+\item{corral}{\code{string}. Method used to adjust points that would be placed to
+wide horizontally, default is \code{"none"}. See details below.}
+
+\item{corral.width}{\code{numeric}. Width of the corral, default is \code{0.9}.}
+
+\item{groupOnX}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} No longer needed.}
+
+\item{beeswarmArgs}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} No longer used.}
 
 \item{na.rm}{If \code{FALSE}, the default, missing values are removed with
 a warning. If \code{TRUE}, missing values are silently removed.}
 
 \item{show.legend}{logical. Should this layer be included in the legends?
 \code{NA}, the default, includes if any aesthetics are mapped.
-\code{FALSE} never includes, and \code{TRUE} always includes.}
+\code{FALSE} never includes, and \code{TRUE} always includes.
+It can also be a named logical vector to finely select the aesthetics to
+display.}
 
 \item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
-the default plot specification, e.g. \code{\link{borders}}.}
-
-\item{...}{other arguments passed on to \code{\link{layer}}. These are
-often aesthetics, used to set an aesthetic to a fixed value, like
-\code{color = "red"} or \code{size = 3}. They may also be parameters
-to the paired geom/stat.}
+the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 }
 \description{
-The beeswarm geom is a convenient means to offset points within categories to reduce overplotting. Uses the beeswarm package
+The beeswarm geom is a convenient means to offset points within categories to
+reduce overplotting. Uses the beeswarm package
 }
 \section{Aesthetics}{
 
@@ -75,13 +113,13 @@ The beeswarm geom is a convenient means to offset points within categories to re
   )
   ggplot2::qplot(variable, value, data = distro, geom='beeswarm')
   ggplot2::ggplot(distro,aes(variable, value)) +
-    geom_beeswarm(priority='density',cex=2.5)
+    geom_beeswarm(priority='density',size=2.5)
 }
 \seealso{
-\code{\link{geom_quasirandom}} an alternative method,
- \code{\link[beeswarm]{swarmx}} how spacing is determined,
- \code{\link[ggplot2]{geom_point}} for regular, unjittered points,
- \code{\link[ggplot2]{geom_jitter}} for jittered points,
- \code{\link[ggplot2]{geom_boxplot}} for another way of looking at the conditional
-    distribution of a variable
+\code{\link[=geom_quasirandom]{geom_quasirandom()}} an alternative method,
+\code{\link[beeswarm:swarmx]{beeswarm::swarmx()}} how spacing is determined,
+\code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} for regular, unjittered points,
+\code{\link[ggplot2:geom_jitter]{ggplot2::geom_jitter()}} for jittered points,
+\code{\link[ggplot2:geom_boxplot]{ggplot2::geom_boxplot()}} for another way of looking at the conditional
+distribution of a variable
 }

@@ -1,19 +1,24 @@
 #' Points, jittered to reduce overplotting using the beeswarm package
 #'
-#' The beeswarm geom is a convenient means to offset points within categories to reduce overplotting. Uses the beeswarm package
+#' The beeswarm geom is a convenient means to offset points within categories to
+#'  reduce overplotting. Uses the beeswarm package
 #'
 #' @section Aesthetics:
 #' \Sexpr[results=rd,stage=build]{ggplot2:::rd_aesthetics("geom", "point")}
 #'
 #' @inheritParams ggplot2::geom_point
-#' @inheritParams position_beeswarm
+#' @inheritParams offset_beeswarm
+#' @param dodge.width Amount by which points from different aesthetic groups 
+#' will be dodged. This requires that one of the aesthetics is a factor.
+#' @param groupOnX `r lifecycle::badge("deprecated")` No longer needed.
+#' @param beeswarmArgs `r lifecycle::badge("deprecated")` No longer used.
 #' @import ggplot2
 #' @seealso
-#'  \code{\link{geom_quasirandom}} an alternative method,
-#'  \code{\link[beeswarm]{swarmx}} how spacing is determined,
-#'  \code{\link[ggplot2]{geom_point}} for regular, unjittered points,
-#'  \code{\link[ggplot2]{geom_jitter}} for jittered points,
-#'  \code{\link[ggplot2]{geom_boxplot}} for another way of looking at the conditional
+#'  [geom_quasirandom()] an alternative method,
+#'  [beeswarm::swarmx()] how spacing is determined,
+#'  [ggplot2::geom_point()] for regular, unjittered points,
+#'  [ggplot2::geom_jitter()] for jittered points,
+#'  [ggplot2::geom_boxplot()] for another way of looking at the conditional
 #'     distribution of a variable
 #' @export
 #' @examples
@@ -26,27 +31,63 @@
 #'   )
 #'   ggplot2::qplot(variable, value, data = distro, geom='beeswarm')
 #'   ggplot2::ggplot(distro,aes(variable, value)) +
-#'     geom_beeswarm(priority='density',cex=2.5)
+#'     geom_beeswarm(priority='density',size=2.5)
 geom_beeswarm <- function(
   mapping = NULL,
   data = NULL,
-  priority = c("ascending", "descending", "density", "random", "none"),
-  cex=1,
-  groupOnX=NULL,
-  dodge.width=0,
-  stat='identity',
+  stat = 'identity',
+  ...,
+  method = "swarm",
+  cex = 1,
+  side = 0L,
+  priority = "ascending",
+  fast = TRUE,
+  dodge.width = NULL,
+  corral = "none",
+  corral.width = 0.9,
+  groupOnX = NULL,
+  beeswarmArgs = list(),
   na.rm = FALSE,
   show.legend = NA,
-  inherit.aes = TRUE,
-  ...
+  inherit.aes = TRUE
 ) {
-  position <- position_beeswarm(priority = priority, cex = cex, groupOnX=groupOnX,dodge.width=dodge.width)
+  
+  if (!missing(groupOnX)) {
+    lifecycle::deprecate_soft(
+      when = "0.7.1", what = "geom_beeswarm(groupOnX)", 
+      details='ggplot2 now handles this case automatically.'
+    )
+  }
+  
+  if (!missing(beeswarmArgs)) {
+    lifecycle::deprecate_soft(
+      when = "0.7.1", what = "geom_beeswarm(beeswarmArgs)"
+    )
+  }
 
-  ggplot2::layer(
+  if (!method %in% c("swarm", "compactswarm", "hex", "square", "centre", "center")) {
+    stop(sprintf("The method must be one of: swarm, compactswarm, hex, square, center, or centre."))
+  }
+  if (!corral %in% c("none", "gutter", "wrap", "random", "omit")) {
+    stop(sprintf("The corral argument must be one of: none, gutter, wrap, random, or omit."))
+  }
+  
+  position <- position_beeswarm(
+    method = method,
+    cex = cex,
+    side = side,
+    priority = priority,
+    fast = fast,
+    dodge.width = dodge.width,
+    corral = corral,
+    corral.width = corral.width
+  )
+  
+  layer(
     data = data,
     mapping = mapping,
     stat = stat,
-    geom = ggplot2::GeomPoint,
+    geom = GeomPoint,
     position = position,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
@@ -56,4 +97,3 @@ geom_beeswarm <- function(
     )
   )
 }
-
