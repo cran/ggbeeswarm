@@ -1,0 +1,230 @@
+---
+title: "Usage examples for ggbeeswarm"
+author: "The ggbeeswarm authors"
+show_toc: true
+output:
+  knitr:::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{ggbeeswarm package usage examples}
+  %\VignetteDepends{}
+  %\VignetteKeywords{visualization, display, one dimensional, grouped, groups, violin, scatter, points, quasirandom, beeswarm, van der Corput, beeswarm, ggplot, ggplot2}
+  %\VignettePackage{ggbeeswarm}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+## The basics
+
+This is the simplest example of using `geom_quasirandom` to generate violin scatter plots:
+
+```{r echo=TRUE, height=3.5, width=5}
+library(ggbeeswarm)
+set.seed(12345)
+n <- 100
+dat <- data.frame(
+  data = rnorm(n*2),
+  class = rep(c('a', 'b'), n)
+)
+
+ggplot(dat, aes(x = class, y = data)) +
+  geom_quasirandom()
+```
+
+The usual `ggplot2` options can be used:
+
+```{r}
+ggplot(dat, aes(x = class, y = data)) +
+  geom_quasirandom(aes(color = class))
+```
+
+Additional factors can be shown on the categorical axis by setting `dodge.width`, which creates smaller violin plots at each category (akin to `ggplot2::geom_jitterdodge`) and allows data to be compared within groups:
+
+```{r}
+ggplot(dat, aes(x = group, y = data, color = data > 0)) +
+  geom_quasirandom(dodge.width = 0.8)
+```
+
+This also works on the y-axis automatically:
+
+```{r}
+ggplot(dat, aes(y = group, x = data, color = data > 0)) +
+  geom_quasirandom(dodge.width = 0.8)
+```
+
+These examples also hold for `geom_beeswarm`.
+Note that for the beeswarm methods, the `cex` argument should be specified in order to create well-spaced swarms:
+
+```{r}
+ggplot(dat, aes(x = group, y = data, color = data > 0)) +
+  geom_beeswarm(dodge.width = 0.8, cex=2)
+```
+
+Both `geom_beeswarm` and `geom_quasirandom` also work with facets:
+
+```{r}
+dat2 <- dat
+dat2$group <- rnorm(n*2) > 0
+ggplot(dat2, aes(x = class, y = data)) +
+  geom_quasirandom(dodge.width = 0.8) +
+   facet_wrap(facets = c("group"))
+```
+
+```{r}
+ggplot(dat2, aes(x = class, y = data)) +
+  geom_beeswarm(dodge.width = 0.8, cex=3) +
+   facet_wrap(facets = c("group"))
+```
+
+## Options
+
+There are several ways to plot grouped one-dimensional data combining points and density estimation including:
+
+-   **pseudorandom**: The kernel density is estimated then points are distributed uniform randomly within the density estimate for a given bin.
+    Selection of an appropriate number of bins does not greatly affect appearance but coincidental clumpiness is common.
+
+-   **alternating within bins**: The kernel density is estimated then points are distributed within the density estimate for a given bin evenly spaced with extreme values alternating from right to left e.g. max, 3rd max, ..., 4th max, 2nd max.
+    If maximums are placed on the outside then these plots often form consecutive "smiley" patterns.
+    If minimums are placed on the outside then "frowny" patterns are generated.
+    Selection of the number of bins can have large effects on appearance important.
+
+-   **tukey**: An algorithm described by Tukey and Tukey in "Strips displaying empirical distributions: I. textured dot strips" using constrained permutations of offsets to distribute the data.
+
+-   **quasirandom**: The kernel density is estimated then points are distributed quasi-randomly using the von der Corput sequence within the density estimate for a given bin.
+    Selection of an appropriate number of bins does not greatly affect appearance and position does not depend on plotting parameters.
+
+-   **beeswarm**: The package `beeswarm` provides methods for generating a "beeswarm" plot where points are distributed so that no points overlap.
+    Kernel density is not calculated although the resulting plot does provide an approximate density estimate.
+    Selection of an appropriate number of bins affects appearance and plot and point sizes must be known in advance.
+
+The first four options are included within `geom_quasirandom` using the `method=` argument and beeswarm plots are generated using `geom_beeswarm`:
+
+```{r height=8, width=6.5}
+  library(gridExtra)
+  dat <- list(
+    'Normal'=rnorm(50),
+    'Dense normal'= rnorm(500),
+    'Bimodal'=c(rnorm(100), rnorm(100,5)),
+    'Trimodal'=c(rnorm(100), rnorm(100,5),rnorm(100,-3))
+  )
+  labs<-rep(names(dat),sapply(dat,length))
+  labs<-factor(labs,levels=unique(labs))
+  dat<-unlist(dat)
+  p1<-ggplot(mapping=aes(labs, dat)) +
+    geom_quasirandom(alpha=.2) +
+    ggtitle('quasirandom') + labs(x='') +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  p2<-ggplot(mapping=aes(labs, dat)) +
+    geom_quasirandom(method='pseudorandom',alpha=.2) +
+    ggtitle('pseudorandom') + labs(x='') +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  p3<-ggplot(mapping=aes(labs, dat)) +
+    geom_quasirandom(method='smiley',alpha=.2) +
+    ggtitle('smiley') + labs(x='') +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  p4<-ggplot(mapping=aes(labs, dat)) +
+    geom_quasirandom(method='frowney',alpha=.2) +
+    ggtitle('frowney') + labs(x='') +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  p5<-ggplot(mapping=aes(labs, dat)) +
+    geom_quasirandom(method='tukey',alpha=.2) +
+    ggtitle('tukey') + labs(x='') +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  p6<-ggplot(mapping=aes(labs, dat)) +
+    geom_beeswarm(alpha=.2,size=.75) +
+    ggtitle('geom_beeswarm') + labs(x='') +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  grid.arrange(p1, p2, p3, p4, p5, p6, ncol=3)
+```
+
+`quasirandom` calls `vipor::offsetX` which calls `stats::density` to compute kernel density estimates. The tightness of the fit can be adjusted with the `bandwidth` option and the width of the offset with `width`. `nbins` to adjust the number of bins used in the kernel density is also provided; this can usually be left at its default when using quasirandom offsets but is useful for non-quasirandom methods:
+
+```{r height=8, width=6}
+  library(gridExtra)
+  p1<-ggplot(mapping=aes(labs, dat)) +
+    geom_quasirandom(bandwidth=2,alpha=.2) +
+    ggtitle('bandwidth=2') + labs(x='')
+  p2<-ggplot(mapping=aes(labs, dat)) +
+    geom_quasirandom(bandwidth=.1,alpha=.2) +
+    ggtitle('bandwidth=.1') + labs(x='')
+  p3<-ggplot(mapping=aes(labs, dat)) +
+    geom_quasirandom(width=.1,alpha=.2) +
+    ggtitle('width=.1') + labs(x='')
+  p4<-ggplot(mapping=aes(labs, dat)) +
+    geom_quasirandom(nbins=100,alpha=.2) +
+    ggtitle('nbins=100') + labs(x='')
+  grid.arrange(p1, p2, p3, p4, ncol=1)
+```
+The `frowney` or `smiley` methods are sensitive to the number of bins, so the
+argument `nbins` is more useful/necessary with them:
+```{r height=8, width=6}
+  p1<-ggplot(mapping=aes(labs, dat)) +
+    geom_quasirandom(method='smiley',alpha=.2) +
+    ggtitle('Default (n/5)') + labs(x='')
+  p2<-ggplot(mapping=aes(labs, dat)) +
+    geom_quasirandom(method='smiley',nbins=50,alpha=.2) +
+    ggtitle('nbins=50') + labs(x='')
+  p3<-ggplot(mapping=aes(labs, dat)) +
+    geom_quasirandom(method='smiley',nbins=100,alpha=.2) +
+    ggtitle('nbins=100') + labs(x='')
+  p4<-ggplot(mapping=aes(labs, dat)) +
+    geom_quasirandom(method='smiley',nbins=250,alpha=.2) +
+    ggtitle('nbins=250') + labs(x='')
+  grid.arrange(p1, p2, p3, p4, ncol=1)
+```
+
+
+The `varwidth` argument scales the width of a group by the square root of the 
+number of observations in that group (as in the function `boxplot`):
+
+```{r height=4, width=6}
+  dat <- list(
+    '10 points'=rnorm(10),
+    '50 points'=rnorm(50,2),
+    '200 points'=c(rnorm(400), rnorm(100,5)),
+    '5000 points'= rnorm(5000,1)
+  )
+  labs<-rep(names(dat),sapply(dat,length))
+  labs<-factor(labs,levels=unique(labs))
+  dat<-unlist(dat)
+  ggplot(mapping=aes(labs, dat)) + geom_quasirandom(alpha=.3,varwidth=TRUE)
+```
+
+
+## Real data
+
+```{r}
+library(dplyr)
+set.seed(1234)
+diamonds2 <- diamonds %>%
+  group_by(cut) %>%
+  sample_n(size = 100)
+
+ggplot(diamonds2, aes(x = clarity, y = carat, color = price)) +
+  geom_quasirandom(size=1, varwidth = TRUE, width=0.7) +
+  facet_grid(rows=vars(cut)) +
+  scale_color_viridis_b(option = "A", end = 0.8)
+#  facet_wrap(facets=vars(carat_gt_1), scales = "free_y")
+```
+```{r}
+ggplot(diamonds2, aes(x = clarity, y = carat, color = price)) +
+  geom_beeswarm(size=1, cex=1.3) +
+  facet_grid(rows=vars(cut)) +
+  scale_color_viridis_b(option = "A", end = 0.8)
+```
+
+
+An example using the `beaver1` and `beaver2` data from the `datasets` package:
+```{r}
+  beaver<-data.frame(
+    'Temperature'=c(beaver1$temp,beaver2$temp),
+    'Beaver'=rep(
+      c('Beaver 1','Beaver 2'),
+      c(nrow(beaver1),nrow(beaver2))
+    )
+  )
+  ggplot(beaver,mapping=aes(Beaver, Temperature)) + geom_quasirandom()
+```
+

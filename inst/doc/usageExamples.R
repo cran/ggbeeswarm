@@ -60,13 +60,13 @@ packageKeywords<-"visualization, display, one dimensional, grouped, groups, viol
 ###################################################
 ### code chunk number 8: yaxis (eval = FALSE)
 ###################################################
-##   ggplot(mapping=aes(dat,labs)) + geom_quasirandom(aes(color=labs),groupOnX=FALSE)
+##   ggplot(mapping=aes(dat,labs)) + geom_quasirandom(aes(color=labs))
 
 
 ###################################################
 ### code chunk number 9: showYaxis
 ###################################################
-  ggplot(mapping=aes(dat,labs)) + geom_quasirandom(aes(color=labs),groupOnX=FALSE)
+  ggplot(mapping=aes(dat,labs)) + geom_quasirandom(aes(color=labs))
 
 
 ###################################################
@@ -87,14 +87,14 @@ packageKeywords<-"visualization, display, one dimensional, grouped, groups, viol
 ### code chunk number 12: dodgey (eval = FALSE)
 ###################################################
 ##   labs2<-factor(rep(1:2,each=n))
-##   ggplot(mapping=aes(dat,labs,color=labs2)) + geom_quasirandom(dodge.width=.8,groupOnX=FALSE)
+##   ggplot(mapping=aes(dat,labs,color=labs2)) + geom_quasirandom(dodge.width=.8)
 
 
 ###################################################
 ### code chunk number 13: showDodgey
 ###################################################
   labs2<-factor(rep(1:2,each=n))
-  ggplot(mapping=aes(dat,labs,color=labs2)) + geom_quasirandom(dodge.width=.8,groupOnX=FALSE)
+  ggplot(mapping=aes(dat,labs,color=labs2)) + geom_quasirandom(dodge.width=.8)
 
 
 ###################################################
